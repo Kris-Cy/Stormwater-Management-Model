@@ -30,7 +30,7 @@ using namespace std;
 boost::test_tools::predicate_result check_cdd_float(std::vector<float>& test,
     std::vector<float>& ref, long cdd_tol){
 
-    float tmp, min_cdd = 10.0;
+    float tmp, min_cdd = 10.000;
 
     // TODO: What if the vectors aren't the same length?
 

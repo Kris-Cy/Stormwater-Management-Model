@@ -3,7 +3,7 @@
 //
 //   Project:  EPA SWMM5
 //   Version:  5.2
-//   Date:     11/01/21   (Build 5.2.0)
+//   Date:     10/29/22   (Build 5.2.2)
 //   Author:   L. Rossman
 //
 //   Conveyance system node functions.
@@ -27,9 +27,16 @@
 //   Build 5.1.015:
 //   - Fatal error issued if a storage node's area curve produces a negative
 //     volume when extrapolated to the node's full depth.
-//  Build 5.2.0:
-//  - Support added Streets and Inlets.
-//  - Support added for analytical storage shapes.
+//   Build 5.2.0:
+//   - Support added Streets and Inlets.
+//   - Support added for analytical storage shapes.
+//   Build 5.2.1:
+//   - Warning no longer issued when node full depth is increased to match
+//     crown of highest connecting link.
+//   - a2 term for paraboloid shaped storage units was corrected
+//   Build 5.2.2:
+//   - Warning restored for node full depth being increased to crown of highest
+//     connecting link.
 //-----------------------------------------------------------------------------
 #define _CRT_SECURE_NO_DEPRECATE
 

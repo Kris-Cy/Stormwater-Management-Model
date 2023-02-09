@@ -3,7 +3,7 @@
 //
 //   Project:  EPA SWMM5
 //   Version:  5.2
-//   Date:     11/01/21   (Build 5.2.0)
+//   Date:     10/29/22   (Build 5.2.2)
 //   Author:   L. Rossman
 //             M. Tryby (EPA)
 //
@@ -36,12 +36,16 @@
 //   - Support added for head-dependent weir coefficient curves.
 //   - Adjustment of regulator link crest offset to match downstream node invert
 //     now only done for Dynamic Wave flow routing.
-//  Build 5.1.014:
-//  - Conduit evap. and seepage losses initialized to 0 in conduit_initState()
-//    and not allowed to exceed current flow rate in conduit_getLossRate().
-//  Build 5.2.0:
+//   Build 5.1.014:
+//   - Conduit evap. and seepage losses initialized to 0 in conduit_initState()
+//     and not allowed to exceed current flow rate in conduit_getLossRate().
+//   Build 5.2.0:
 //   - Support added for Streets and Inlets.
 //   - Support added for variable speed pumps.
+//   Build 5.2.1
+//   - Warning no longer issued when conduit elevation drop < MIN_DELTA_Z.
+//   Build 5.2.2:
+//   - Warning for conduit elevation drop < MIN_DELTA_Z restored.
 //-----------------------------------------------------------------------------
 #define _CRT_SECURE_NO_DEPRECATE
 

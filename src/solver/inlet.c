@@ -3,7 +3,7 @@
 //
 //   Project:  EPA SWMM5
 //   Version:  5.2
-//   Date:     11/01/21 (Build 5.2.0)
+//   Date:     10/08/22 (Build 5.2.2)
 //   Author:   L. Rossman
 //
 //   Street/Channel Inlet Functions
@@ -14,6 +14,10 @@
 //   Administration Hydraulic Engineering Circular No. 22, 3rd Edition,
 //   FHWA-NHI-10-009, August 2013).
 //
+//   Build 5.2.1:
+//   - Substitutes the constant BIG for HUGE.
+//   Build 5.2.2:
+//   - Additional statistics added to Street Flow Summary table.
 //-----------------------------------------------------------------------------
 #define _CRT_SECURE_NO_DEPRECATE
 
@@ -1028,17 +1032,18 @@ void writeStreetStatsHeader()
     report_writeLine("*******************");
     report_writeLine("");
     fprintf(Frpt.file,
-"\n  ----------------------------------------------------------------------------------------------------------------------"
-"\n                        Peak   Maximum   Maximum                             Peak Flow   Average      Bypass    BackFlow"
-"\n                        Flow    Spread     Depth  Inlet             Inlet      Capture   Capture   Frequency   Frequency");
+"\n  ---------------------------------------------------------------------------------------------------------------------------------------"
+"\n                                                                                        Peak     Avg.   Bypass     Back     Peak     Peak"
+"\n                        Peak   Maximum   Maximum                                        Flow     Flow     Flow     Flow  Capture   Bypass"
+"\n                        Flow    Spread     Depth  Inlet             Inlet     Inlet  Capture  Capture     Freq     Freq  / Inlet     Flow");
     if (UnitSystem == US) fprintf(Frpt.file,
-"\n  Street Conduit         %3s        ft        ft  Design            Location         %%         %%           %%           %%",
-        FlowUnitWords[FlowUnits]);
+"\n  Street Conduit         %3s        ft        ft  Design            Location  Count     Pcnt     Pcnt     Pcnt     Pcnt      %3s      %3s",
+        FlowUnitWords[FlowUnits], FlowUnitWords[FlowUnits], FlowUnitWords[FlowUnits]);
     else fprintf(Frpt.file,
-"\n  Street Conduit         %3s         m         m  Design            Location         %%         %%           %%           %%",
-        FlowUnitWords[FlowUnits]);
+"\n  Street Conduit         %3s         m         m  Design            Location            Pcnt     Pcnt     Pcnt     Pcnt      %3s      %3s",
+        FlowUnitWords[FlowUnits], FlowUnitWords[FlowUnits], FlowUnitWords[FlowUnits]);
     fprintf(Frpt.file,
-"\n  ----------------------------------------------------------------------------------------------------------------------");
+"\n  ---------------------------------------------------------------------------------------------------------------------------------------");
 }
 
 //=============================================================================
@@ -1093,19 +1098,24 @@ void writeStreetStats(int link)
             fprintf(Frpt.file, "  ON-GRADE");
         else
             fprintf(Frpt.file, "  ON-SAG  ");
+        fprintf(Frpt.file, "  %5d", inlet->numInlets);            
         fp = inlet->stats.flowPeriods / 100.0;
         if (fp > 0.0)
         {
             cp = inlet->stats.capturePeriods / 100.0;
-            fprintf(Frpt.file, " %9.2f", inlet->stats.peakFlowCapture);
+            fprintf(Frpt.file, "  %7.2f", inlet->stats.peakFlowCapture);
             if (cp > 0.0)
             {
                 afc = inlet->stats.avgFlowCapture / cp;
                 bpf = inlet->stats.bypassFreq / cp;
             }
-            fprintf(Frpt.file, " %9.2f", afc);
-            fprintf(Frpt.file, "   %9.2f", bpf);
-            fprintf(Frpt.file, "   %9.2f", inlet->stats.backflowPeriods / fp);
+            fprintf(Frpt.file, "  %7.2f", afc);
+            fprintf(Frpt.file, "  %7.2f", bpf);
+            fprintf(Frpt.file, "  %7.2f", inlet->stats.backflowPeriods / fp);
+            fprintf(Frpt.file, "  %7.2f", (maxFlow / Street[t].sides) * UCF(FLOW) *
+                0.01 * inlet->stats.peakFlowCapture / inlet->numInlets);
+            fprintf(Frpt.file, "  %7.2f", maxFlow * UCF(FLOW) * 0.01 *
+                (100.0 - inlet->stats.peakFlowCapture));            
         }
     }
 }
@@ -1567,7 +1577,7 @@ double getOnSagCapturedFlow(TInlet* inlet, double q, double d)
 //
 {
     int    linkIndex, designIndex, totalInlets;
-    double qCaptured = 0.0, qMax = HUGE;
+    double qCaptured = 0.0, qMax = BIG;
 
     if (inlet->numInlets == 0) return 0.0;
     totalInlets = Nsides * inlet->numInlets;
@@ -1680,7 +1690,7 @@ void findOnSagGrateFlows(int i, double d, double *Qw, double *Qo)
     // --- orifice flow applies
     else
     {
-        *Qo = 0.67 * Ao * sqrt(2.0 * GRAVITY * di);        //HEC-22 Eq(4-27)
+        *Qo = 0.67 * Ao * sqrt(2.0 * 32.16 * di);          //HEC-22 Eq(4-27)
     }
 }
 
@@ -1763,7 +1773,7 @@ double getCurbOrificeFlow(double di, double h, double L, int throatAngle)
         d = di - h / 2.0;
     else if (throatAngle == INCLINED_THROAT)
         d = di + (h / 2.0) * 0.7071;
-    return 0.67 * h * L * sqrt(2.0 * GRAVITY * d);         //HEC-22 Eq(4-31a)
+    return 0.67 * h * L * sqrt(2.0 * 32.16 * d);           //HEC-22 Eq(4-31a)
 }
 
 //=============================================================================
@@ -1895,7 +1905,7 @@ double getCustomCapturedFlow(TInlet* inlet, double q, double d)
             qBypassed,                 // inlet's bypassed flow (cfs)
             qCaptured,                 // inlet's captured flow (cfs)
             qIncrement,                // increment to captured flow (cfs)
-            qMax = HUGE;               // user-supplied flow capture limit (cfs)
+            qMax = BIG;                // user-supplied flow capture limit (cfs)
 
     if (inlet->numInlets == 0) return 0.0;
 

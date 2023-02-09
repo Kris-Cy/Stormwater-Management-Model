@@ -1,6 +1,6 @@
 name: Build and Test
 
-on: workflow-dispatch
+on: workflow_dispatch
 #   push:
 #     branches: [ master, develop, release, lew-develop ]
 #   pull_request:

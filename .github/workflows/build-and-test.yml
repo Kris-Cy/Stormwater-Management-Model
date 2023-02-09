@@ -1,10 +1,10 @@
 name: Build and Test
 
-on:
-  push:
-    branches: [ master, develop, release, lew-develop ]
-  pull_request:
-    branches: [ master, develop, release, lew-develop ]
+on: workflow-dispatch
+#   push:
+#     branches: [ master, develop, release, lew-develop ]
+#   pull_request:
+#     branches: [ master, develop, release, lew-develop ]
 
 env:
   OMP_NUM_THREADS: 1
